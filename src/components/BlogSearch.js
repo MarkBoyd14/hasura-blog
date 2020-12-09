@@ -20,15 +20,15 @@ export default function BlogSearch() {
   const [search, { loading, error, data }] = useLazyQuery(SEARCH);
   return (
     <div>
-      <Search
+      {/* <Search
         inputVal={inputVal}
         onChange={(e) => setInputVal(e.target.value)}
         onSubmit={() => {
           search({ variables: { match: `%${inputVal}%` } });
         }}
-      />
-      <Link to="/blog/new">New Blog Post</Link>
-      <Blogs newBlogs={data ? data.blogs : null} />
+      /> */}
+
+      <Blogs />
     </div>
   );
 }

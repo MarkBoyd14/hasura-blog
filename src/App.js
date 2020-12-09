@@ -11,9 +11,9 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/link-ws';
 import Home from './components/Home';
 import Blog from './components/Blog';
-import BlogSearch from './components/BlogSearch';
-import Create from './components/blog/Create';
-import Update from './components/blog/Update';
+import Blogs from './components/Blogs';
+import New from './components/blog/New';
+import Edit from './components/blog/Edit';
 
 const GRAPHQL_ENDPOINT = 'hasura-blog.hasura.app/v1/graphql';
 
@@ -50,10 +50,10 @@ function App() {
     <BrowserRouter>
       <ApolloProvider client={client}>
         <Switch>
-          <Route exact path="/blog/new" component={Create} />
-          <Route exact path="/blog/update/:id" component={Update} />
+          <Route exact path="/blog/new" component={New} />
+          <Route exact path="/blog/edit/:id" component={Edit} />
           <Route exact path="/blog/:id" component={Blog} />
-          <Route exact path="/blog" component={BlogSearch} />
+          <Route exact path="/blog" component={Blogs} />
           <Route exact path="/" component={Home} />
         </Switch>
       </ApolloProvider>

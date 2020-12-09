@@ -12,30 +12,35 @@ const Form = styled.form`
   }
 `;
 
-const UPDATE_BLOG = gql`
+const EDIT_BLOG = gql`
   mutation($id: uuid!, $body: String!, $title: String!) {
     update_blogs_by_pk(
       pk_columns: { id: $id }
       _set: { body: $body, title: $title }
     ) {
-      body
       id
       title
+      body
     }
   }
 `;
 
-export default function Update(props) {
-  const { id } = props.match.params;
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+export default function Edit(props) {
+  const { match, location, history } = props;
+  const { id } = match.params;
+  const [title, setTitle] = useState(location.state.title);
+  const [body, setBody] = useState(location.state.body);
 
-  const [updateBlog] = useMutation(UPDATE_BLOG, { variables: { id } });
+  const [editBlog] = useMutation(EDIT_BLOG, { variables: { id } });
+
+  console.log(title);
 
   return (
     <Form
-      onSubmit={() => {
-        updateBlog({ variables: { title: title, body: body } });
+      onSubmit={(e) => {
+        e.preventDefault();
+        editBlog({ variables: { title: title, body: body } });
+        history.push('/blog');
       }}
     >
       <label>Title</label>

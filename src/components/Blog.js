@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSubscription, gql } from '@apollo/client';
-import { List, ListItem } from './shared/List';
 import { Link } from 'react-router-dom';
 
 const BLOG = gql`
@@ -19,7 +18,6 @@ const Blog = ({
   },
 }) => {
   const { loading, error, data } = useSubscription(BLOG, { variables: { id } });
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error</p>;
 
@@ -27,7 +25,14 @@ const Blog = ({
 
   return (
     <div>
-      <Link to={`/blog/update/${id}`}>Update</Link>
+      <Link
+        to={{
+          pathname: `/blog/update/${id}`,
+          state: { title: title, body: body },
+        }}
+      >
+        Update
+      </Link>
       <h2>{title}</h2>
       <p>{body}</p>
     </div>
