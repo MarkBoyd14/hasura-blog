@@ -3,14 +3,15 @@ import styled from '@emotion/styled';
 export const List = styled.ul`
   padding: 0;
   margin: 0 0 100px;
-  min-width: 1000px;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
 `;
 
 export const ListItem = styled.li`
-  display: block;
-  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px 20px;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.125);

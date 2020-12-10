@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import styled from '@emotion/styled';
-import { Input, Button } from '../shared/Form';
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  > button {
-    margin-left: 1rem;
-  }
-`;
+import { Form, Input, TextArea, Button } from '../shared/Form';
 
 const EDIT_BLOG = gql`
   mutation($id: uuid!, $body: String!, $title: String!) {
@@ -36,20 +27,31 @@ export default function Edit(props) {
   console.log(title);
 
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-        editBlog({ variables: { title: title, body: body } });
-        history.push('/blog');
-      }}
-    >
-      <label>Title</label>
-      <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-      <label>Body</label>
-      <Input value={body} onChange={(e) => setBody(e.target.value)} />
-      <Button type="submit" value="submit">
-        Submit
-      </Button>
-    </Form>
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          editBlog({ variables: { title: title, body: body } });
+          history.push('/blog');
+        }}
+      >
+        <label>Title</label>
+        <Input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <label>Body</label>
+        <TextArea
+          type="text"
+          rows="10"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+        />
+        <Button type="submit" value="submit" style={{ width: '200px' }}>
+          Submit
+        </Button>
+      </Form>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { Link } from 'react-router-dom';
+import { Container } from './shared/Container';
 import { List, ListItem } from './shared/List';
 import { Button } from './shared/Form';
 
@@ -25,33 +26,63 @@ const DELETE_BLOG = gql`
 `;
 
 export default function Blogs(props) {
-  const { location, history } = props;
+  const { history } = props;
   const { loading, error, data } = useQuery(BLOGS);
   const [deleteBlog] = useMutation(DELETE_BLOG);
   const renderBlogs = (blogs) => {
     return data.blogs.map(({ id, title, body }) => (
       <ListItem key={id}>
-        <Link to={`/blog/${id}`}>{title}</Link>
-        <Button>
-          <Link
-            to={{
-              pathname: `/blog/edit/${id}`,
-              state: { title: title, body: body },
-            }}
-          >
-            Edit
-          </Link>
-        </Button>
-        <Button
-          style={{ backgroundColor: 'red', borderColor: 'red' }}
-          onClick={(e) => {
-            e.preventDefault();
-            deleteBlog({ variables: { id } });
-            history.push('/blog');
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            flex: '1',
           }}
         >
-          Delete
-        </Button>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <h3>
+              <Link to={`/blog/${id}`}>{title}</Link>
+            </h3>
+            <div>
+              <Link
+                to={{
+                  pathname: `/blog/edit/${id}`,
+                  state: { title: title, body: body },
+                }}
+              >
+                <Button>Edit</Button>
+              </Link>
+              <Button
+                style={{
+                  backgroundColor: 'red',
+                  borderColor: 'red',
+                  marginLeft: '10px',
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  let result = window.confirm(
+                    'Are you sure you want to delete?',
+                  );
+                  if (result) {
+                    deleteBlog({ variables: { id } });
+                    history.push('/blog');
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+
+          <p>{body}</p>
+        </div>
       </ListItem>
     ));
   };
@@ -60,13 +91,19 @@ export default function Blogs(props) {
   if (error) return <p>Error</p>;
 
   return (
-    <div>
-      <Button>
-        <Link to="/blog/new" style={{ color: '#fff', textDecoration: 'none' }}>
-          New Post
+    <Container>
+      <div>
+        <Link
+          to="/blog/new"
+          style={{
+            color: '#fff',
+            textDecoration: 'none',
+          }}
+        >
+          <Button>New Post</Button>
         </Link>
-      </Button>
-      <List>{renderBlogs(data.blogs)}</List>
-    </div>
+        <List style={{ marginTop: '10px' }}>{renderBlogs(data.blogs)}</List>
+      </div>
+    </Container>
   );
 }

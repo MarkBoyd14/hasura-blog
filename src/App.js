@@ -9,6 +9,8 @@ import {
 } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/link-ws';
+import NavBar from './components/shared/NavBar';
+import { Main } from './components/shared/Main';
 import Home from './components/Home';
 import Blog from './components/Blog';
 import Blogs from './components/Blogs';
@@ -49,13 +51,16 @@ function App() {
   return (
     <BrowserRouter>
       <ApolloProvider client={client}>
-        <Switch>
-          <Route exact path="/blog/new" component={New} />
-          <Route exact path="/blog/edit/:id" component={Edit} />
-          <Route exact path="/blog/:id" component={Blog} />
-          <Route exact path="/blog" component={Blogs} />
-          <Route exact path="/" component={Home} />
-        </Switch>
+        <NavBar />
+        <Main>
+          <Switch>
+            <Route exact path="/blog/new" component={New} />
+            <Route exact path="/blog/edit/:id" component={Edit} />
+            <Route exact path="/blog/:id" component={Blog} />
+            <Route exact path="/blog" component={Blogs} />
+            <Route exact path="/" component={Home} />
+          </Switch>
+        </Main>
       </ApolloProvider>
     </BrowserRouter>
   );
