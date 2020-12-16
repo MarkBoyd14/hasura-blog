@@ -1,0 +1,20 @@
+.editor-class {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  height: auto;
+  min-height: 100px;
+}
+
+.public-DraftStyleDefault-block {
+  margin: 10px 10px;
+}
+
+.toolbar-class {
+  border: 1px solid #ccc;
+}
+
+.wrapper-class:after {
+  content: '';
+  display: table;
+  clear: both;
+}

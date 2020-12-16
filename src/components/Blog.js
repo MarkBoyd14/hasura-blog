@@ -25,16 +25,8 @@ const Blog = ({
 
   return (
     <div>
-      <Link
-        to={{
-          pathname: `/blog/update/${id}`,
-          state: { title: title, body: body },
-        }}
-      >
-        Update
-      </Link>
       <h2>{title}</h2>
-      <p>{body}</p>
+      <p dangerouslySetInnerHTML={{ __html: body }}></p>
     </div>
   );
 };

@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import styled from '@emotion/styled';
-import { Form, Input, TextArea, Button } from '../shared/Form';
+import { Form, Input, Button } from '../shared/Form';
+import {
+  EditorState,
+  ContentState,
+  convertToHTML,
+  convertFromHTML,
+} from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import '../../App.css';
 
 const EDIT_BLOG = gql`
   mutation($id: uuid!, $body: String!, $title: String!) {
@@ -20,18 +28,35 @@ export default function Edit(props) {
   const { match, location, history } = props;
   const { id } = match.params;
   const [title, setTitle] = useState(location.state.title);
-  const [body, setBody] = useState(location.state.body);
+
+  const blocksFromHtml = convertFromHTML(location.state.body);
+  const draftJsState = ContentState.createFromBlockArray(
+    blocksFromHtml.contentBlocks,
+    blocksFromHtml.entityMap,
+  );
+  const [editorState, setEditorState] = useState(
+    EditorState.createWithContent(draftJsState),
+  );
+
+  const [convertedContent, setConvertedContent] = useState(null);
+  const handleEditorChange = (state) => {
+    setEditorState(state);
+    convertContentToHTML();
+  };
+
+  const convertContentToHTML = () => {
+    let currentContentAsHTML = convertToHTML(editorState.getCurrentContent());
+    setConvertedContent(currentContentAsHTML);
+  };
 
   const [editBlog] = useMutation(EDIT_BLOG, { variables: { id } });
-
-  console.log(title);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
       <Form
         onSubmit={(e) => {
           e.preventDefault();
-          editBlog({ variables: { title: title, body: body } });
+          editBlog({ variables: { title: title, body: convertedContent } });
           history.push('/blog');
         }}
       >
@@ -42,13 +67,18 @@ export default function Edit(props) {
           onChange={(e) => setTitle(e.target.value)}
         />
         <label>Body</label>
-        <TextArea
-          type="text"
-          rows="10"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
+        <Editor
+          editorState={editorState}
+          onEditorStateChange={handleEditorChange}
+          wrapperClassName="wrapper-class"
+          editorClassName="editor-class"
+          toolbarClassName="toolbar-class"
         />
-        <Button type="submit" value="submit" style={{ width: '200px' }}>
+        <Button
+          type="submit"
+          value="submit"
+          style={{ width: '200px', marginTop: '10px' }}
+        >
           Submit
         </Button>
       </Form>
