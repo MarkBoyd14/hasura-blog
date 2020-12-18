@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { FETCH_BLOGS } from '../Blogs';
 import { Form, Input, Button } from '../shared/Form';
-import { EditorState } from 'draft-js';
+import { convertToRaw, EditorState } from 'draft-js';
+import { stateToHTML } from 'draft-js-export-html';
 import { Editor } from 'react-draft-wysiwyg';
-import { convertToHTML } from 'draft-convert';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import '../../App.css';
 
 const ADD_BLOG = gql`
-  mutation($title: String!, $body: String!) {
-    insert_blogs(objects: { title: $title, body: $body }) {
+  mutation($title: String!, $text: json!) {
+    insert_blogs(objects: { title: $title, text: $text }) {
       returning {
         id
         title
-        body
+        text
       }
     }
   }
@@ -26,16 +26,10 @@ export default function New(props) {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
-  const [convertedContent, setConvertedContent] = useState(null);
-  const handleEditorChange = (state) => {
-    setEditorState(state);
-    convertContentToHTML();
-  };
 
-  const convertContentToHTML = () => {
-    let currentContentAsHTML = convertToHTML(editorState.getCurrentContent());
-    setConvertedContent(currentContentAsHTML);
-  };
+  const rawState = convertToRaw(editorState.getCurrentContent());
+  console.log(editorState.getCurrentContent());
+
   const [addBlog, { loading, error }] = useMutation(ADD_BLOG);
 
   const updateCache = (client, { data: { insert_blogs } }) => {
@@ -43,7 +37,7 @@ export default function New(props) {
       query: FETCH_BLOGS,
       variables: {
         title,
-        body: convertedContent,
+        text: rawState,
       },
     });
     const newBlog = insert_blogs.returning[0];
@@ -54,7 +48,7 @@ export default function New(props) {
       query: FETCH_BLOGS,
       variables: {
         title,
-        body: convertedContent,
+        text: rawState,
       },
       data: newData,
     });
@@ -65,7 +59,7 @@ export default function New(props) {
         onSubmit={(e) => {
           e.preventDefault();
           addBlog({
-            variables: { title, body: convertedContent },
+            variables: { title, text: rawState },
             update: updateCache,
           });
           Input.value = '';
@@ -84,7 +78,7 @@ export default function New(props) {
         <Editor
           name="body"
           editorState={editorState}
-          onEditorStateChange={handleEditorChange}
+          onEditorStateChange={setEditorState}
           wrapperClassName="wrapper-class"
           editorClassName="editor-class"
           toolbarClassName="toolbar-class"

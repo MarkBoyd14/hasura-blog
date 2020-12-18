@@ -5,6 +5,8 @@ import { Container } from './shared/Container';
 import { List, ListItem } from './shared/List';
 import { Button } from './shared/Form';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { stateToHTML } from 'draft-js-export-html';
+import { convertFromRaw } from 'draft-js';
 
 export const FETCH_BLOGS = gql`
   {
@@ -12,6 +14,7 @@ export const FETCH_BLOGS = gql`
       id
       title
       body
+      text
     }
   }
 `;
@@ -37,7 +40,7 @@ const DELETE_BLOG = gql`
 export default function Blogs(props) {
   const { history } = props;
   const { loading, error, data } = useQuery(FETCH_BLOGS);
-  const { changeIndex } = useMutation(CHANGE_INDEX);
+  // const { changeIndex } = useMutation(CHANGE_INDEX);
   const [deleteBlog] = useMutation(DELETE_BLOG);
   const [state, setState] = useState(undefined);
 
@@ -131,7 +134,7 @@ export default function Blogs(props) {
                   <Link
                     to={{
                       pathname: `/blog/edit/${blog.id}`,
-                      state: { title: blog.title, body: blog.body },
+                      state: { title: blog.title, text: blog.text },
                     }}
                   >
                     <Button>Edit</Button>
@@ -149,7 +152,7 @@ export default function Blogs(props) {
                       );
                       if (result) {
                         deleteBlog({
-                          variables: blog.id,
+                          variables: { id: blog.id },
                           // update: updateCache,
                         });
                         history.push('/blog');
@@ -160,7 +163,12 @@ export default function Blogs(props) {
                   </Button>
                 </div>
               </div>
-              <div dangerouslySetInnerHTML={{ __html: blog.body }} />
+
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: stateToHTML(convertFromRaw(blog.text)),
+                }}
+              />
             </div>
           </ListItem>
         )}

@@ -4,12 +4,14 @@ import { Form, Input, Button } from '../shared/Form';
 import {
   EditorState,
   ContentState,
-  convertToHTML,
+  convertFromRaw,
+  convertToRaw,
   convertFromHTML,
 } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import '../../App.css';
+import { stateToHTML } from 'draft-js-export-html';
 
 const EDIT_BLOG = gql`
   mutation($id: uuid!, $body: String!, $title: String!) {
@@ -28,26 +30,18 @@ export default function Edit(props) {
   const { match, location, history } = props;
   const { id } = match.params;
   const [title, setTitle] = useState(location.state.title);
-
-  const blocksFromHtml = convertFromHTML(location.state.body);
-  const draftJsState = ContentState.createFromBlockArray(
-    blocksFromHtml.contentBlocks,
-    blocksFromHtml.entityMap,
-  );
-  const [editorState, setEditorState] = useState(
-    EditorState.createWithContent(draftJsState),
+  const markup = stateToHTML(convertFromRaw(location.state.text));
+  const blocksFromHTML = convertFromHTML(markup);
+  const contentState = ContentState.createFromBlockArray(
+    blocksFromHTML.contentBlocks,
+    blocksFromHTML.entityMap,
   );
 
-  const [convertedContent, setConvertedContent] = useState(null);
-  const handleEditorChange = (state) => {
-    setEditorState(state);
-    convertContentToHTML();
-  };
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createWithContent(contentState),
+  );
 
-  const convertContentToHTML = () => {
-    let currentContentAsHTML = convertToHTML(editorState.getCurrentContent());
-    setConvertedContent(currentContentAsHTML);
-  };
+  const rawState = convertToRaw(editorState.getCurrentContent());
 
   const [editBlog] = useMutation(EDIT_BLOG, { variables: { id } });
 
@@ -56,7 +50,7 @@ export default function Edit(props) {
       <Form
         onSubmit={(e) => {
           e.preventDefault();
-          editBlog({ variables: { title: title, body: convertedContent } });
+          editBlog({ variables: { title: title, text: rawState } });
           history.push('/blog');
         }}
       >
@@ -69,7 +63,7 @@ export default function Edit(props) {
         <label>Body</label>
         <Editor
           editorState={editorState}
-          onEditorStateChange={handleEditorChange}
+          onEditorStateChange={setEditorState}
           wrapperClassName="wrapper-class"
           editorClassName="editor-class"
           toolbarClassName="toolbar-class"
