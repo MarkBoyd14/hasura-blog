@@ -1,1 +1,1 @@
-CRUD blog app created with Hasura and React. Currently supports creating and updating blog posts.
+CRUD micro cms with Hasura and React. Currently supports creating, updating, deleting and reordering content blocks.
