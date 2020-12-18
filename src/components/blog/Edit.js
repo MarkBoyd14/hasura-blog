@@ -14,14 +14,14 @@ import '../../App.css';
 import { stateToHTML } from 'draft-js-export-html';
 
 const EDIT_BLOG = gql`
-  mutation($id: uuid!, $body: String!, $title: String!) {
+  mutation($id: uuid!, $text: json!, $title: String!) {
     update_blogs_by_pk(
       pk_columns: { id: $id }
-      _set: { body: $body, title: $title }
+      _set: { text: $text, title: $title }
     ) {
       id
       title
-      body
+      text
     }
   }
 `;
@@ -60,7 +60,7 @@ export default function Edit(props) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <label>Body</label>
+        <label>Text</label>
         <Editor
           editorState={editorState}
           onEditorStateChange={setEditorState}

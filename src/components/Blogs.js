@@ -7,13 +7,13 @@ import { Button } from './shared/Form';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { stateToHTML } from 'draft-js-export-html';
 import { convertFromRaw } from 'draft-js';
+import Edit from './blog/Edit';
 
 export const FETCH_BLOGS = gql`
   {
     blogs {
       id
       title
-      body
       text
     }
   }
@@ -32,7 +32,7 @@ const DELETE_BLOG = gql`
     delete_blogs_by_pk(id: $id) {
       id
       title
-      body
+      text
     }
   }
 `;
